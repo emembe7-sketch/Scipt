@@ -1,0 +1,119 @@
+-- =============================================================================
+-- AUTO SPAWN ALL 8 SLOTS (PRE-TURN ENABLE SUPPORTED)
+-- =============================================================================
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+
+-- Đảm bảo các cấu phần GUI đã tải xong
+local ScreenGUI = script.Parent
+local SpawnMenu = ScreenGUI:WaitForChild("SpawnMenu")
+local Bar1 = SpawnMenu:WaitForChild("Bar1")
+local Bar2 = SpawnMenu:WaitForChild("Bar2")
+
+-- 1. TẠO CẤU TRÚC GUI CHO NÚT AUTO (BO GÓC, DI CHUYỂN ĐƯỢC)
+local AutoButton = Instance.new("TextButton")
+AutoButton.Name = "AutoSpawnButton"
+AutoButton.Size = UDim2.new(0, 100, 0, 40)
+AutoButton.Position = UDim2.new(0.85, 0, 0.15, 0)
+AutoButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+AutoButton.Text = "AUTO: OFF"
+AutoButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+AutoButton.Font = Enum.Font.SourceSansBold
+AutoButton.TextSize = 16
+AutoButton.ZIndex = 999
+AutoButton.Parent = ScreenGUI
+
+-- Bo góc nhỏ (UICorner)
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = AutoButton
+
+-- Tạo Stroke viền
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(255, 100, 100)
+UIStroke.Thickness = 2
+UIStroke.Parent = AutoButton
+
+-- 2. LOGIC KÉO THẢ DI CHUYỂN NÚT (DRAGGABLE)
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	local TargetPosition = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	TweenService:Create(AutoButton, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = TargetPosition}):Play()
+end
+
+AutoButton.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = AutoButton.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+AutoButton.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
+
+-- 3. LOGIC AUTO SPAWN (CHO PHÉP BẬT TRƯỚC KHI VÀO TRẬN)
+local AutoSpawnEnabled = false
+local AllSlots = {
+	{Parent = Bar1, Name = "Slot1"},
+	{Parent = Bar1, Name = "Slot2"},
+	{Parent = Bar1, Name = "Slot3"},
+	{Parent = Bar1, Name = "Slot4"},
+	{Parent = Bar2, Name = "Slot5"},
+	{Parent = Bar2, Name = "Slot6"},
+	{Parent = Bar2, Name = "Slot7"},
+	{Parent = Bar2, Name = "Slot8"}
+}
+
+AutoButton.Activated:Connect(function()
+	AutoSpawnEnabled = not AutoSpawnEnabled
+	
+	if AutoSpawnEnabled then
+		AutoButton.Text = "AUTO: ON"
+		AutoButton.TextColor3 = Color3.fromRGB(100, 255, 100)
+		UIStroke.Color = Color3.fromRGB(100, 255, 100)
+		AutoButton.BackgroundColor3 = Color3.fromRGB(25, 50, 25)
+	else
+		AutoButton.Text = "AUTO: OFF"
+		AutoButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+		UIStroke.Color = Color3.fromRGB(255, 100, 100)
+		AutoButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	end
+end)
+
+-- Vòng lặp quét liên tục (Chờ trạng thái InStage hoạt động)
+task.spawn(function()
+	while true do
+		task.wait(0.1) -- Quét trạng thái mỗi 0.1 giây
+		
+		-- Chỉ thực hiện spawn khi trạng thái Auto được bật VÀ game đang thực sự trong trận đấu
+		if AutoSpawnEnabled and GameValues and GameValues.InStage == true then[span_1](start_span)[span_1](end_span)
+			for _, slotData in ipairs(AllSlots) do
+				local slotButton = slotData.Parent:FindFirstChild(slotData.Name)
+				
+				-- Kiểm tra nút lính có tồn tại và đang sẵn sàng kích hoạt
+				if slotButton and slotButton:IsA("ImageButton") and slotButton.Active == true then[span_2](start_span)[span_2](end_span)
+					BindSpawnUnit(slotButton)[span_3](start_span)[span_3](end_span)
+					task.wait(0.05) -- Giảm tải request gửi lên server cùng lúc
+				end
+			end
+		end
+	end
+end)
