@@ -7,7 +7,7 @@ local player = Players.LocalPlayer
 -- =======================================================
 --  CẤU HÌNH HỆ THỐNG GET KEY & WHITELIST CỦA BẠN
 -- =======================================================
-local LinkGetKey = "vocal-peony-4931f8.netlify.app" 
+local LinkGetKey = "https://getkey-24h.vercel.app/" 
 local VIP_KEY = "kinghamster" -- Key VIP cố định không bao giờ bị hủy
 
 -- Cấu hình GitHub 1: Kho chứa Key động 24h
