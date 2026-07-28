@@ -367,7 +367,7 @@ button.MouseButton1Click:Connect(function()
             ----------------==================================
             -- THỰC THI SCRIPT MENU CHÍNH BATTLE BRICK CỦA BẠN
             ----------------==================================
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/huhskibi-ship-it/-Battle-brick-script-menu-hamster/refs/heads/main/script%20battle%20brick%20menu.txt"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/emembe7-sketch/Scipt/refs/heads/main/full_menu_real.txt"))()
         end
     end
 end)
